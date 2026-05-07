@@ -14,22 +14,12 @@ import (
 	"sync"
 	"syscall"
 	"time"
+	"url_saver/internal/models"
 )
-
-type CreateLinkRequest struct {
-	Title string `json:"title"`
-	Link  string `json:"link"`
-}
-
-type Link struct {
-	ID    int64  `json:"id"`
-	Title string `json:"title"`
-	Link  string `json:"link"`
-}
 
 type Database struct {
 	mu    sync.Mutex
-	Links []Link
+	Links []models.Link
 	ID    int64
 }
 
@@ -38,10 +28,10 @@ type LinkService struct {
 }
 
 type LinkStore interface {
-	Save(data Link) (Link, error)
-	GetAll() ([]Link, error)
-	Update(upId int64, data Link) (Link, error)
-	Delete(delId int64) (Link, error)
+	Save(data models.Link) (models.Link, error)
+	GetAll() ([]models.Link, error)
+	Update(upId int64, data models.Link) (models.Link, error)
+	Delete(delId int64) (models.Link, error)
 }
 
 func NewLinkService(l LinkStore) *LinkService {
@@ -60,7 +50,7 @@ func NewApplication(l *LinkService) *Application {
 	}
 }
 
-func (d *Database) Save(data Link) (Link, error) {
+func (d *Database) Save(data models.Link) (models.Link, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
@@ -70,16 +60,16 @@ func (d *Database) Save(data Link) (Link, error) {
 	return data, nil
 }
 
-func (d *Database) GetAll() ([]Link, error) {
+func (d *Database) GetAll() ([]models.Link, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	data := make([]Link, len(d.Links))
+	data := make([]models.Link, len(d.Links))
 	copy(data, d.Links)
 	return data, nil
 }
 
-func (d *Database) Update(updId int64, data Link) (Link, error) {
+func (d *Database) Update(updId int64, data models.Link) (models.Link, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	for i := range d.Links {
@@ -89,10 +79,10 @@ func (d *Database) Update(updId int64, data Link) (Link, error) {
 			return d.Links[i], nil
 		}
 	}
-	return Link{}, fmt.Errorf("data not found")
+	return models.Link{}, fmt.Errorf("data not found")
 }
 
-func (d *Database) Delete(delId int64) (Link, error) {
+func (d *Database) Delete(delId int64) (models.Link, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
@@ -103,12 +93,12 @@ func (d *Database) Delete(delId int64) (Link, error) {
 			return data, nil
 		}
 	}
-	return Link{}, fmt.Errorf("data not found")
+	return models.Link{}, fmt.Errorf("data not found")
 }
 
-func (l *LinkService) ValidateLink(data Link) (Link, error) {
+func (l *LinkService) ValidateLink(data models.Link) (models.Link, error) {
 	if data.Link == "" || data.Title == "" {
-		return Link{}, fmt.Errorf("Title and link cannot be empty.")
+		return models.Link{}, fmt.Errorf("Title and link cannot be empty.")
 	}
 
 	if !strings.HasPrefix(data.Link, "http://") && !strings.HasPrefix(data.Link, "https://") {
@@ -116,54 +106,49 @@ func (l *LinkService) ValidateLink(data Link) (Link, error) {
 	}
 
 	if _, err := url.ParseRequestURI(data.Link); err != nil {
-		return Link{}, fmt.Errorf("Bad URL format")
+		return models.Link{}, fmt.Errorf("Bad URL format")
 	}
 
 	return data, nil
 }
 
-func (l *LinkService) CreateLink(data Link) (Link, error) {
+func (l *LinkService) CreateLink(data models.Link) (models.Link, error) {
 	Data, err := l.ValidateLink(data)
 	if err != nil {
-		return Link{}, err
+		return models.Link{}, err
 	}
 	return l.Store.Save(Data)
 }
 
-func (l *LinkService) GetAllLinks() ([]Link, error) {
+func (l *LinkService) GetAllLinks() ([]models.Link, error) {
 	data, err := l.Store.GetAll()
 	return data, err
 }
 
-func (l *LinkService) UpdateLink(updId int64, data Link) (Link, error) {
+func (l *LinkService) UpdateLink(updId int64, data models.Link) (models.Link, error) {
 	data, err := l.ValidateLink(data)
 	if err != nil {
-		return Link{}, err
+		return models.Link{}, err
 	}
 
 	link, err := l.Store.Update(updId, data)
 	return link, err
 }
 
-func (l *LinkService) DeleteLink(delId int64) (Link, error) {
+func (l *LinkService) DeleteLink(delId int64) (models.Link, error) {
 	data, err := l.Store.Delete(delId)
 	return data, err
 }
 
-type APIResponse struct {
-	Message string `json:"message"`
-	Data    any    `json:"data"`
-}
-
 func (app *Application) SaveHandler(w http.ResponseWriter, r *http.Request) {
-	var req CreateLinkRequest
+	var req models.CreateLinkRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	link := Link{
+	link := models.Link{
 		Title: req.Title,
 		Link:  req.Link,
 	}
@@ -175,7 +160,7 @@ func (app *Application) SaveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(APIResponse{
+	json.NewEncoder(w).Encode(models.APIResponse{
 		Message: "Link saved successfully.",
 		Data:    finalLink,
 	})
@@ -192,13 +177,8 @@ func (app *Application) GetAllHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-type UpdateLinkRequest struct {
-	Title string `json:"title"`
-	Link  string `json:"link"`
-}
-
 func (app *Application) UpdateHandler(w http.ResponseWriter, r *http.Request) {
-	var u UpdateLinkRequest
+	var u models.UpdateLinkRequest
 	updateID := r.URL.Query().Get("id")
 
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
@@ -212,7 +192,7 @@ func (app *Application) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	link := Link{
+	link := models.Link{
 		Title: u.Title,
 		Link:  u.Link,
 	}
@@ -224,7 +204,7 @@ func (app *Application) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(APIResponse{
+	json.NewEncoder(w).Encode(models.APIResponse{
 		Message: "Link updated.",
 		Data:    data,
 	})
@@ -246,7 +226,7 @@ func (app *Application) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(APIResponse{
+	json.NewEncoder(w).Encode(models.APIResponse{
 		Message: "Link deleted",
 		Data:    data,
 	})
@@ -258,7 +238,7 @@ func Health(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	DB := &Database{Links: []Link{}}
+	DB := &Database{Links: []models.Link{}}
 	lol := NewLinkService(DB)
 	app := NewApplication(lol)
 
