@@ -1,0 +1,12 @@
+# binaries
+*.exe
+*.out
+
+# environment files
+.env
+
+# IDE
+.vscode/
+
+# macOS
+.DS_Store
