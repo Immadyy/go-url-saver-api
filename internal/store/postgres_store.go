@@ -30,7 +30,7 @@ func NewPostgresStore(connStr string) (*PostgresStore, error) {
 func (p *PostgresStore) Save(data models.Link) (models.Link, error) {
 	query := `
 	INSERT INTO links (title, link, created_at)
-	VALUES ($1, $2, DEFAULT)
+	VALUES ($1, $2)
 	RETURNING id`
 
 	err := p.DB.QueryRow(query, data.Title, data.Link).Scan(&data.ID)
