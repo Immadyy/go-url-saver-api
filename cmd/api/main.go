@@ -17,12 +17,12 @@ import (
 
 func main() {
 	//memoryStore := &store.MemoryStore{}
-	connStr := "postgres://immady:kabutar@localhost:5432/dbname?sslmode=disable"
-	PostgresStore, err := store.NewPostgresStore(connStr)
+	connStr := "postgres://immady:kabutar@localhost:5432/immady?sslmode=disable"
+	postgresStore, err := store.NewPostgresStore(connStr)
 	if err != nil {
 		log.Fatal("Database could'nt start: ", err)
 	}
-	linkService := service.NewLinkService(PostgresStore)
+	linkService := service.NewLinkService(postgresStore)
 	handler := handlers.NewHandler(linkService)
 
 	r := http.NewServeMux()
