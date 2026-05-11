@@ -43,16 +43,16 @@ func (app *Handler) SaveHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// func (app *Handler) GetAllHandler(w http.ResponseWriter, r *http.Request) {
-// 	data, err := app.LinkService.GetAllLinks()
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
+func (app *Handler) GetAllHandler(w http.ResponseWriter, r *http.Request) {
+	data, err := app.LinkService.GetAllLinks()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(data)
-// }
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(data)
+}
 
 // func (app *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 // 	var u models.UpdateLinkRequest
