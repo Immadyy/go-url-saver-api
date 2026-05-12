@@ -51,11 +51,6 @@ func (p *PostgresStore) GetAll() ([]models.Link, error) {
 
 	rows, err := p.DB.Query(query)
 	if err != nil {
-		if pgErr, ok := err.(*pq.Error); ok {
-			if pgErr.Code == "23503" {
-				return []models.Link{}, models.ErrNotFound
-			}
-		}
 		return []models.Link{}, fmt.Errorf("something went wrong: %w", err)
 	}
 	defer rows.Close()
