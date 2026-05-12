@@ -86,3 +86,22 @@ func (p *PostgresStore) Update(updId int64, data models.Link) (models.Link, erro
 
 	return data, nil
 }
+
+func (p *PostgresStore) Delete(delId int64) error {
+	query := `DELETE FROM links WHERE id=$1`
+
+	res, err := p.DB.Exec(query, delId)
+	if err != nil {
+		return fmt.Errorf("couldn't delete the data: %w", err)
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return models.ErrNotFound
+	}
+
+	return nil
+}

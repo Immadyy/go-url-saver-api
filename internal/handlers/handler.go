@@ -89,27 +89,26 @@ func (app *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func (app *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request) {
-// 	delId := r.URL.Query().Get("id")
-// 	number, err := strconv.ParseInt(delId, 10, 64)
-// 	if err != nil {
-// 		http.Error(w, "invalid id", http.StatusBadRequest)
-// 		return
-// 	}
+func (app *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request) {
+	delId := r.URL.Query().Get("id")
+	number, err := strconv.ParseInt(delId, 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
 
-// 	data, err := app.LinkService.DeleteLink(number)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusNotFound)
-// 		return
-// 	}
+	newErr := app.LinkService.DeleteLink(number)
+	if newErr != nil {
+		http.Error(w, newErr.Error(), http.StatusNotFound)
+		return
+	}
 
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(models.APIResponse{
-// 		Message: "Link deleted",
-// 		Data:    data,
-// 	})
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Message: "Link deleted successfully",
+	})
 
-// }
+}
 
 func (app *Handler) HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("All is good."))
