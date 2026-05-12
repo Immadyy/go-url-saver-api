@@ -14,7 +14,7 @@ type LinkService struct {
 type LinkStore interface {
 	Save(data models.Link) (models.Link, error)
 	GetAll() ([]models.Link, error)
-	//Update(upId int64, data models.Link) (models.Link, error)
+	Update(upId int64, data models.Link) (models.Link, error)
 	//Delete(delId int64) (models.Link, error)
 }
 
@@ -53,15 +53,15 @@ func (l *LinkService) GetAllLinks() ([]models.Link, error) {
 	return data, err
 }
 
-// func (l *LinkService) UpdateLink(updId int64, data models.Link) (models.Link, error) {
-// 	data, err := l.ValidateLink(data)
-// 	if err != nil {
-// 		return models.Link{}, err
-// 	}
+func (l *LinkService) UpdateLink(updId int64, data models.Link) (models.Link, error) {
+	data, err := l.ValidateLink(data)
+	if err != nil {
+		return models.Link{}, err
+	}
 
-// 	link, err := l.Store.Update(updId, data)
-// 	return link, err
-// }
+	link, err := l.Store.Update(updId, data)
+	return link, err
+}
 
 // func (l *LinkService) DeleteLink(delId int64) (models.Link, error) {
 // 	data, err := l.Store.Delete(delId)

@@ -2,6 +2,7 @@ package store
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"url_saver/internal/models"
 
@@ -70,4 +71,18 @@ func (p *PostgresStore) GetAll() ([]models.Link, error) {
 	}
 
 	return links, nil
+}
+
+func (p *PostgresStore) Update(updId int64, data models.Link) (models.Link, error) {
+	query := `UPDATE links SET title=$1, link=$2 WHERE id=$3 RETURNING id, title, link`
+
+	err := p.DB.QueryRow(query, data.Title, data.Link, updId).Scan(&data.ID, &data.Title, &data.Link)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Link{}, models.ErrNotFound
+		}
+		return models.Link{}, fmt.Errorf("couldn't update the data: %w", err)
+	}
+
+	return data, nil
 }

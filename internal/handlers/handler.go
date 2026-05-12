@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"url_saver/internal/models"
 	"url_saver/internal/service"
 )
@@ -54,39 +55,39 @@ func (app *Handler) GetAllHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(data)
 }
 
-// func (app *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
-// 	var u models.UpdateLinkRequest
-// 	updateID := r.URL.Query().Get("id")
+func (app *Handler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
+	var u models.UpdateLinkRequest
+	updateID := r.URL.Query().Get("id")
 
-// 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-// 		http.Error(w, err.Error(), http.StatusBadRequest)
-// 		return
-// 	}
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-// 	number, err := strconv.ParseInt(updateID, 10, 64)
-// 	if err != nil {
-// 		http.Error(w, "invalid id", http.StatusBadRequest)
-// 		return
-// 	}
+	number, err := strconv.ParseInt(updateID, 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
 
-// 	link := models.Link{
-// 		Title: u.Title,
-// 		Link:  u.Link,
-// 	}
+	link := models.Link{
+		Title: u.Title,
+		Link:  u.Link,
+	}
 
-// 	data, err := app.LinkService.UpdateLink(number, link)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusBadRequest)
-// 		return
-// 	}
+	data, err := app.LinkService.UpdateLink(number, link)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(models.APIResponse{
-// 		Message: "Link updated.",
-// 		Data:    data,
-// 	})
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(models.APIResponse{
+		Message: "Link updated.",
+		Data:    data,
+	})
 
-// }
+}
 
 // func (app *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 // 	delId := r.URL.Query().Get("id")
