@@ -20,3 +20,7 @@ type APIResponse struct {
 	Message string `json:"message"`
 	Data    any    `json:"data"`
 }
+
+type Message struct {
+	Message string `json:"message"`
+}
