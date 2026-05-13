@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"url_saver/internal/config"
 	"url_saver/internal/handlers"
 	"url_saver/internal/middleware"
 	"url_saver/internal/routes"
@@ -17,8 +18,9 @@ import (
 
 func main() {
 	//memoryStore := &store.MemoryStore{}
-	connStr := "postgres://immady:kabutar@localhost:5432/immady?sslmode=disable"
-	postgresStore, err := store.NewPostgresStore(connStr)
+	cfg := config.LoadConfig()
+
+	postgresStore, err := store.NewPostgresStore(cfg.DB_URL)
 	if err != nil {
 		log.Fatal("Database could'nt start: ", err)
 	}
@@ -29,7 +31,7 @@ func main() {
 	routes.RegisterRoutes(r, handler)
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + cfg.PORT,
 		Handler: middleware.LoggerMiddleWare(r),
 	}
 
