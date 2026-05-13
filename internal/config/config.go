@@ -8,9 +8,9 @@ import (
 )
 
 type Config struct {
-	DB_URL string
-	PORT   string
-	// JWT_SECRET string
+	DBURL string
+	PORT  string
+	// JWTSECRET string
 }
 
 func getEnv(key, fallback string) string {
@@ -27,7 +27,7 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		DB_URL: getEnv("DB_URL", "postgres://localhost:5432/default_db"),
-		PORT:   getEnv("PORT", "8080"),
+		DBURL: getEnv("DB_URL", "postgres://localhost:5432/default_db"),
+		PORT:  getEnv("PORT", "8080"),
 	}
 }

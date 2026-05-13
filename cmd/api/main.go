@@ -20,7 +20,7 @@ func main() {
 	//memoryStore := &store.MemoryStore{}
 	cfg := config.LoadConfig()
 
-	postgresStore, err := store.NewPostgresStore(cfg.DB_URL)
+	postgresStore, err := store.NewPostgresStore(cfg.DBURL)
 	if err != nil {
 		log.Fatal("Database could'nt start: ", err)
 	}
