@@ -23,7 +23,7 @@ func getEnv(key, fallback string) string {
 func LoadConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("couldn't load env file: ", err)
+		log.Print("couldn't load env file: ", err)
 	}
 
 	return &Config{
