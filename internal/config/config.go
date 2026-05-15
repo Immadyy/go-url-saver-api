@@ -10,9 +10,9 @@ import (
 type Config struct {
 	DBURL string
 	PORT  string
-	// JWTSECRET string
 }
 
+// Excellent helper function structure
 func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists && value != "" {
 		return value
@@ -21,13 +21,19 @@ func getEnv(key, fallback string) string {
 }
 
 func LoadConfig() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Print("couldn't load env file: ", err)
+	// Suppress filesystem errors safely for container layers
+	_ = godotenv.Load()
+
+	// Utilize your helper function for clean fallbacks
+	port := getEnv("PORT", "8080")
+	dbURL := getEnv("DB_URL", "")
+
+	if dbURL == "" {
+		log.Println("Warning: DB_URL environment variable is empty")
 	}
 
 	return &Config{
-		DBURL: getEnv("DB_URL", "postgres://localhost:5432/default_db"),
-		PORT:  getEnv("PORT", "8080"),
+		DBURL: dbURL,
+		PORT:  port,
 	}
 }

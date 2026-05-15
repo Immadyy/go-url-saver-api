@@ -23,6 +23,19 @@ func NewPostgresStore(connStr string) (*PostgresStore, error) {
 		return nil, err
 	}
 
+	query := `
+    CREATE TABLE IF NOT EXISTS urls (
+        id SERIAL PRIMARY KEY,
+        original_url TEXT NOT NULL,
+        short_key VARCHAR(10) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );`
+
+	_, err = db.Exec(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run migrations: %w", err)
+	}
+
 	return &PostgresStore{
 		DB: db,
 	}, nil

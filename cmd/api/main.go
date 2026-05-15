@@ -22,7 +22,7 @@ func main() {
 
 	postgresStore, err := store.NewPostgresStore(cfg.DBURL)
 	if err != nil {
-		log.Fatal("Database could'nt start: ", err)
+		log.Fatal("Database couldn't start: ", err)
 	}
 	linkService := service.NewLinkService(postgresStore)
 	handler := handlers.NewHandler(linkService)
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	go func() {
-		log.Println("Server starting on :8080")
+		log.Printf("Server starting on :%v", cfg.PORT)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Error: %s\n", err)
 		}
