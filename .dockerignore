@@ -1,0 +1,4 @@
+.env
+.git
+__debug_bin
+*.exe
