@@ -24,12 +24,12 @@ func NewPostgresStore(connStr string) (*PostgresStore, error) {
 	}
 
 	query := `
-    CREATE TABLE IF NOT EXISTS urls (
-        id SERIAL PRIMARY KEY,
-        original_url TEXT NOT NULL,
-        short_key VARCHAR(10) UNIQUE NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );`
+	CREATE TABLE IF NOT EXISTS links (
+		id BIGSERIAL PRIMARY KEY,
+		title TEXT NOT NULL,
+		link TEXT NOT NULL,
+		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);`
 
 	_, err = db.Exec(query)
 	if err != nil {
