@@ -2,157 +2,181 @@
 
 A backend CRUD API built with Go and PostgreSQL using a layered architecture.
 
-This project started as a simple in-memory URL saver and was later upgraded step-by-step into a PostgreSQL-backed API with Docker support. The main focus of the project was to understand backend fundamentals properly instead of only following tutorials.
+This project started as a simple in-memory URL saver and was later upgraded step-by-step into a PostgreSQL-backed API with Docker support. The main focus was to understand backend fundamentals properly instead of just following tutorials.
 
 ---
 
-# Features
+## Features
 
-- Create links
-- Get all saved links
-- Update existing links
-- Delete links
-- PostgreSQL integration
-- Docker + Docker Compose setup
+- Create, read, update, and delete saved links
+- PostgreSQL persistence
+- Docker and Docker Compose setup
 - Environment variable configuration
 - Middleware logging
 - Graceful shutdown
-- Layered architecture
+- Layered architecture (handler → service → store)
 
 ---
 
-# Tech Stack
+## Tech Stack
 
-- Go
-- PostgreSQL
-- Docker
-- Docker Compose
-- net/http
-- database/sql
-- lib/pq
+- **Go** (standard library `net/http`, `database/sql`)
+- **PostgreSQL** (via `lib/pq` driver)
+- **Docker** and **Docker Compose**
 
 ---
 
-# Project Structure
+## Project Structure
 
 ```text
-cmd/
-    api/
-        main.go
+.
+├── cmd/
+│   └── api/
+│       └── main.go
+└── internal/
+    ├── config/
+    ├── handlers/
+    ├── middleware/
+    ├── models/
+    ├── routes/
+    ├── service/
+    └── store/
+```
 
-internal/
-    config/
-    handlers/
-    middleware/
-    models/
-    routes/
-    service/
-    store/
+---
 
--------------------------------------------------------------------------------------------------------------
-
-    Architecture:
+## Architecture
 
 The project follows a layered structure:
 
-Handler -> Service -> Store -> PostgreSQL
-Handler Layer
+```
+Handler → Service → Store → PostgreSQL
+```
 
-Responsible for:
+**Handler Layer** — HTTP concerns only. Parses requests, encodes/decodes JSON, sends responses.
 
-HTTP requests
-decoding/encoding JSON
-sending responses
-Service Layer
+**Service Layer** — Business logic. Validation, URL formatting, and other rules live here.
 
-Responsible for:
+**Store Layer** — Database access. Handles SQL queries and persistence details.
 
-business logic
-validation
-URL formatting/checking
-Store Layer
+The app was initially built with an in-memory store, then swapped to PostgreSQL without changing the handler or service layers. That refactor proved the architecture was working.
 
-Responsible for:
+---
 
-SQL queries
-database interaction
-persistence
+## API Endpoints
 
-The project was first built using an in-memory store and later switched to PostgreSQL without changing the whole application structure.
+### Create a link
 
-API Endpoints
-Create Link
+```
 POST /save_url
+```
 
-Request Body:
+**Request Body:**
 
+```json
 {
   "title": "Google",
   "link": "https://google.com"
 }
-Get All Links
+```
+
+### Get all links
+
+```
 GET /get_all
-Update Link
+```
+
+### Update a link
+
+```
 PUT /update_link?id=1
+```
 
-Request Body:
+**Request Body:**
 
+```json
 {
   "title": "Updated Title",
   "link": "https://example.com"
 }
-Delete Link
+```
+
+### Delete a link
+
+```
 DELETE /delete_link?id=1
-Environment Variables
+```
 
-Create a .env file in the project root.
+---
 
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
 DB_URL=postgres://username:password@localhost:5432/dbname?sslmode=disable
 PORT=8080
-Run Without Docker
+```
 
-Make sure PostgreSQL is installed and running locally.
+---
 
-Run the server:
+## Running Locally
 
+Make sure PostgreSQL is installed and running locally, then:
+
+```bash
 go run ./cmd/api
-Run With Docker
+```
 
-Build and start the containers:
+---
 
+## Running with Docker
+
+Build and start both the Go API and PostgreSQL containers:
+
+```bash
 docker compose up --build
+```
 
-This starts:
+To stop everything:
 
-Go API container
-PostgreSQL container
-
-Stop containers:
-
+```bash
 docker compose down
-What I Learned From This Project
-Layered backend architecture
-Dependency injection in Go
-PostgreSQL CRUD operations
-QueryRow vs Query vs Exec
-Error handling patterns
-Docker networking basics
-Environment configuration
-Graceful shutdown handling
-Future Improvements
-Unit tests for service layer
-JWT authentication
-Pagination
-Redis caching
-Why I Built This
+```
+
+---
+
+## What I Learned
+
+- Layered backend architecture in Go
+- Dependency injection by hand (no frameworks)
+- PostgreSQL CRUD operations (`QueryRow`, `Query`, `Exec`)
+- Structuring Go projects with `internal/` packages
+- Error handling patterns without exceptions
+- Docker networking between services
+- Environment configuration with `.env`
+- Graceful shutdown with signal handling
+
+---
+
+## Future Improvements
+
+- Unit tests for the service layer
+- JWT-based authentication
+- Pagination for the `get_all` endpoint
+- Redis caching layer
+
+---
+
+## Why I Built This
 
 I built this project to strengthen my backend fundamentals before moving deeper into Java and Spring Boot.
 
-The goal was to understand:
+I wanted to understand:
 
-how APIs work internally
-how databases connect to applications
-how layering and abstractions work
-how containers and environments work
+- How APIs actually work under the hood
+- How databases connect to real applications
+- Why layering and abstractions matter
+- How containers and environment configs fit together
 
-I also plan to rebuild the same project later in Java/Spring Boot to compare both ecosystems and design tradeoffs.
+I plan to rebuild the same project in Java/Spring Boot later to compare both ecosystems and the tradeoffs each one makes.
