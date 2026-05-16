@@ -16,6 +16,8 @@ A layered CRUD backend API built with Go.
 - net/http
 - JSON
 - Mutex concurrency protection
+- Docker
+- Docker Compose
 
 ## Run
 
