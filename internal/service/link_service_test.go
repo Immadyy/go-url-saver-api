@@ -29,3 +29,5 @@ func (m *MockStore) Update(upId int64, data models.Link) (models.Link, error) {
 func (m *MockStore) Delete(delId int64) error {
 	return nil
 }
+
+//END
