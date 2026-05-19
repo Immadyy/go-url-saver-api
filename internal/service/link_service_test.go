@@ -91,3 +91,40 @@ func TestCreateLink(t *testing.T) {
 		})
 	}
 }
+
+// 3. Simple Tests for remaining CRUD Methods
+func TestGetAllLinks(t *testing.T) {
+	mockStore := &MockStore{}
+	service := NewLinkService(mockStore)
+
+	links, err := service.GetAllLinks()
+	assert.NoError(t, err)
+	assert.Len(t, links, 1)
+	assert.Equal(t, "Google", links[0].Title)
+}
+
+func TestUpdateLink(t *testing.T) {
+	mockStore := &MockStore{}
+	service := NewLinkService(mockStore)
+
+	// Valid update
+	input := models.Link{Title: "New Title", Link: "newurl.com"}
+	updatedLink, err := service.UpdateLink(5, input)
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(5), updatedLink.ID)
+	assert.Equal(t, "https://newurl.com", updatedLink.Link)
+
+	// Invalid update (fails validation)
+	invalidInput := models.Link{Title: "", Link: "newurl.com"}
+	_, err = service.UpdateLink(5, invalidInput)
+	assert.Error(t, err)
+}
+
+func TestDeleteLink(t *testing.T) {
+	mockStore := &MockStore{}
+	service := NewLinkService(mockStore)
+
+	err := service.DeleteLink(10)
+	assert.NoError(t, err)
+}
